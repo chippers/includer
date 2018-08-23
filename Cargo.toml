@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "includer",
+    "includer_codegen",
+]
+
+exclude = [
+    "examples/webapp",
+]

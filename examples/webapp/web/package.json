@@ -1,0 +1,15 @@
+{
+  "name": "includer_example_webapp",
+  "version": "1.0.0",
+  "description": "Web assets example for `includer` crate",
+  "main": "src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^4.0.0-alpha",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^3.1.0"
+  }
+}

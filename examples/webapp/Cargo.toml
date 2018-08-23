@@ -1,0 +1,10 @@
+[package]
+name = "webapp"
+version = "0.1.0"
+authors = ["chip reed <chip@chip.sh>"]
+
+[dependencies]
+includer = {path = "../../includer"}
+
+[build-dependencies]
+includer_codegen = { path = "../../includer_codegen" }

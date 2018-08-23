@@ -1,0 +1,8 @@
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+script:
+  - cargo test
+  - cd examples/webapp && cargo build
