@@ -9,10 +9,8 @@ extern crate walkdir;
 mod assets;
 pub mod prelude;
 pub mod utils;
-//#[cfg(feature = "web")]
-//pub mod web;
 
-pub use assets::Assets;
+pub use assets::*;
 use std::env;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -128,7 +126,7 @@ impl Codegen {
 
         for assets in &self.assets_builder {
             written += writer
-                .write(assets.generate().as_bytes())
+                .write(assets.to_string().as_bytes())
                 .expect("Unable to write to Codegen file");
         }
 
@@ -148,9 +146,9 @@ impl Codegen {
 /// pipelines.
 ///
 /// [`Codegen`]: ./struct.Codegen.html
-pub trait Pipeline {
-    /// Generates a string of Rust code to be inserted in the [`Codegen`] file.
+pub trait Pipeline: ToString {
+    /*/// Generates a string of Rust code to be inserted in the [`Codegen`] file.
     ///
     /// [`Codegen`]: ./struct.Codegen.html
-    fn generate(&self) -> String;
+    fn generate(&self) -> String;*/
 }

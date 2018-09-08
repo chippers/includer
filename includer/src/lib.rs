@@ -1,6 +1,9 @@
 #[cfg(feature = "web")]
 pub mod web;
 
+#[cfg(feature = "web")]
+pub use web::*;
+
 #[derive(Debug)]
 pub struct Asset {
     pub uri: &'static str,

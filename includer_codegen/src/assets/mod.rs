@@ -1,3 +1,6 @@
+//#[cfg(feature = "web")]
+//mod web;
+
 use proc_macro2::{Ident, Span};
 use std::path::{Path, PathBuf};
 use utils;
@@ -8,6 +11,9 @@ use utils::FilterListType::*;
 use utils::FilterRule;
 use walkdir::WalkDir;
 use Pipeline;
+
+//#[cfg(feature = "web")]
+//pub use self::web::*;
 
 struct AssetInfo {
     path: String,
@@ -140,8 +146,8 @@ impl Assets {
     }
 }
 
-impl Pipeline for Assets {
-    fn generate(&self) -> String {
+impl ToString for Assets {
+    fn to_string(&self) -> String {
         let mut entries = Vec::new();
         for maybe_entry in WalkDir::new(&self.path) {
             let entry = maybe_entry.expect("Couldn't read DirEntry");
@@ -201,6 +207,8 @@ impl Pipeline for Assets {
     }
 }
 
+impl Pipeline for Assets {}
+
 fn normalize_path(path: &Path, dir: &Path, prefix: &str) -> String {
     let relative = path.strip_prefix(&dir).expect("Couldn't strip path prefix");
     let path = PathBuf::from("/").join(prefix).join(&relative);
@@ -214,8 +222,8 @@ fn generate_asset_const(ident_str: &str, raw_assets: Vec<AssetInfo>) -> String {
     for AssetInfo { path, clean_path } in raw_assets {
         structs.push(quote! {
             Asset {
-            uri: #clean_path,
-            data: include_bytes!(#path),
+                uri: #clean_path,
+                data: include_bytes!(#path),
             }
         });
     }
