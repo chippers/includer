@@ -17,7 +17,7 @@ Typically results are used by the includer crate.
 web = []
 
 [dependencies]
-includer = {path = "../includer"}
+includer = "0.1"
 walkdir = "2"
 quote = "0.6"
 syn = "0.14"
