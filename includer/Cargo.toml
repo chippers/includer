@@ -2,9 +2,22 @@
 name = "includer"
 version = "0.1.0"
 authors = ["chip reed <chip@chip.sh>"]
+license = "Apache-2.0 OR MIT"
+readme = "README.md"
+homepage = "https://github.com/chippers/includer"
+repository = "https://github.com/chippers/includer"
+documentation = "https://docs.rs/includer"
+categories = ["filesystem", "development-tools::build-utils"]
+description = """
+Compile time included assets.
+Typically generated automatically by includer_codegen.
+"""
 
 [features]
 web = ["http"]
 
 [dependencies]
 http = { version = "0.1", optional = true }
+
+[badges]
+travis-ci = { repository = "chippers/includer" }
