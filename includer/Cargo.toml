@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["chip reed <chip@chip.sh>"]
 
 [features]
-default = ["web"]
 web = ["http"]
 
 [dependencies]
