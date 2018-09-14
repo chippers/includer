@@ -10,6 +10,16 @@ pub struct Asset {
     pub data: &'static [u8],
 }
 
+impl Asset {
+    pub fn uri(&self) -> &'static str {
+        self.uri
+    }
+
+    pub fn data(&self) -> &'static [u8] {
+        self.data
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

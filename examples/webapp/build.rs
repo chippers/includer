@@ -6,8 +6,7 @@ use std::path::PathBuf;
 
 fn main() {
     let cargo_dir = var("CARGO_MANIFEST_DIR").unwrap();
-    let dist = PathBuf::from(cargo_dir)
-        .join("web/dist");
+    let dist = PathBuf::from(cargo_dir).join("web/dist");
 
     let webpack = Assets::new("ASSETS", dist).build();
 

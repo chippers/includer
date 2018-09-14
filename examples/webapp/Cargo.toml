@@ -6,5 +6,8 @@ authors = ["chip reed <chip@chip.sh>"]
 [dependencies]
 includer = {path = "../../includer"}
 
+[dev-dependencies]
+select = "0.4"
+
 [build-dependencies]
 includer_codegen = { path = "../../includer_codegen" }
