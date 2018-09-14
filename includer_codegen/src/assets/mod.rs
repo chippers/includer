@@ -196,8 +196,7 @@ impl ToString for Assets {
             .map(|p| AssetInfo {
                 path: utils::path_to_string(p),
                 clean_path: normalize_path(p, &self.path, &self.prefix),
-            })
-            .collect();
+            }).collect();
 
         if asset_info.is_empty() {
             panic!("No assets were matched, something is wrong")
