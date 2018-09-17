@@ -1,9 +1,7 @@
 #[macro_use]
 extern crate quote;
-extern crate includer;
 extern crate proc_macro2;
 pub extern crate regex;
-extern crate syn;
 extern crate walkdir;
 
 mod assets;

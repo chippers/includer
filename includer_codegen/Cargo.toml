@@ -1,28 +1,23 @@
 [package]
 name = "includer_codegen"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["chip reed <chip@chip.sh>"]
 license = "Apache-2.0 OR MIT"
-readme = "../README.md"
-homepage = "https://github.com/chippers/includer"
+readme = "README.md"
+homepage = "https://github.com/chippers/includer/tree/master/includer_codegen"
 repository = "https://github.com/chippers/includer"
 documentation = "https://docs.rs/includer_codegen"
 categories = ["filesystem", "development-tools::build-utils"]
-description = """
-Built time helper for dynamically including assets at compile time
-Typically results are used by the includer crate.
-"""
+description = "Dynamically include assets at build time through code generation."
 
 [features]
 web = []
 
 [dependencies]
-includer = "0.1"
 walkdir = "2"
 quote = "0.6"
-syn = "0.14"
 regex = "1"
-proc-macro2 = "0.4.14"
+proc-macro2 = "0.4"
 
 [badges]
 travis-ci = { repository = "chippers/includer" }
