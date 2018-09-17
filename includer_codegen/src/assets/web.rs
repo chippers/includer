@@ -1,7 +1,11 @@
 use proc_macro2::{Ident, Span};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use utils::FilterList;
+use utils;
+use utils::Filter;
+use utils::Filter::*;
+use utils::FilterListType;
+use utils::FilterListType::*;
 use walkdir::WalkDir;
 use Pipeline;
 
@@ -12,73 +16,100 @@ struct AssetInfo {
     has_br: bool,
 }
 
-enum Compressions {
+enum CompressionType {
     GZIP,
     BROTLI,
 }
 
-pub struct AssetsBuilder {
+pub struct WebAssets {
     ident: String,
     prefix: String,
-    filter_type: FilterList,
-    include: Vec<String>,
-    exclude: Vec<String>,
+    path: PathBuf,
+    filters: Vec<Filter>,
+    filter_list_type: FilterListType,
     brotli: bool,
     gzip: bool,
-    path: PathBuf,
 }
 
-impl AssetsBuilder {
-    /// Creates a new generator
+impl WebAssets {
+    /// Creates a new `WebAssets` Pipeline
     ///
-    /// By default the filter type is a blacklist.
+    /// By default the filter list type is a blacklist.
     pub fn new<S: Into<String>, P: Into<PathBuf>>(identifier: S, path: P) -> Self {
-        AssetsBuilder {
+        WebAssets {
             ident: identifier.into(),
-            filter_type: FilterList::Blacklist,
-            include: Vec::new(),
-            exclude: Vec::new(),
             prefix: "/".to_string(),
+            path: path.into(),
+            filters: Vec::new(),
+            filter_list_type: Blacklist,
             brotli: true,
             gzip: true,
-            path: path.into(),
         }
     }
 
-    /// Add a file extension to be included in the whitelist
+    /// Add a filter to the pipeline
     ///
-    /// If you wanted to include all javascript and css files in one grouping, you could do
+    /// Filters are applied in the order that they were added, the first
+    /// matching filter determines how the file entry is handled.  If you want
+    /// to include all javascript files, but not the ones in a certain folder,
+    /// then you should add the exclusion rule first, and then the inclusion
+    /// filter.
+    ///
+    /// If there are no filters then all files are matched.  If there are no
+    /// filters and it's a whitelist, no files are matched.
+    ///
+    /// # Examples
+    ///
+    /// Matching everything except css and json files:
     ///
     /// ```
-    /// # use includer_codegen::AssetsBuilder;
-    /// # use std::path::PathBuf;
-    /// AssetsBuilder::new("ASSETS", PathBuf::from("./web/dist"))
+    /// # use includer_codegen::prelude::*;
+    /// #
+    /// WebAssets::new("NON_IMAGE_ASSETS", "../resources")
+    ///     .filter(Filter::exclude_extension("css"))
+    ///     .filter(Filter::exclude_extension("json"));
+    /// ```
+    ///
+    /// Include all javascript files, but exclude all in the `admin`subdirectory:
+    ///
+    /// ```
+    /// # use includer_codegen::prelude::*;
+    /// #
+    /// WebAssets::new("ASSETS", "./web/dist")
     ///     .whitelist()
-    ///     .include("js")
-    ///     .include("css");
+    ///     .filter(Filter::exclude_regex(r"^admin/.*$"))
+    ///     .filter(Filter::include_extension("js"));
     /// ```
     ///
-    /// If the filter is a whitelist and there are no include rules,
-    /// then no files are accepted.
+    /// If you wanted to only match text and markdown files:
     ///
-    /// NOTE: When gzip and/or brotli is enabled, files ending with `.gz` or `.br`
-    /// (respectively) will always be ignored.  They will be embedded too, along side
-    /// the uncompressed asset.
-    pub fn include<S: Into<String>>(mut self, ext: S) -> Self {
-        self.include.push(ext.into());
-        self
-    }
-
-    /// Add a file extension to be included to the blacklist
+    /// ```
+    /// # use includer_codegen::prelude::*;
+    /// #
+    /// WebAssets::new("ASSETS", "../notes")
+    ///     .whitelist()
+    ///     .filter(Filter::include_extension("txt"))
+    ///     .filter(Filter::include_extension("md"));
+    /// ```
     ///
-    /// If the filter type is a blacklist and there are no exclude rules,
-    /// then all files are accepted.
+    /// or to include all css files in a subdirectory `styles`:
     ///
-    /// NOTE: When gzip and/or brotli is enabled, files ending with `.gz` or `.br`
-    /// (respectively) will always be ignored.  They will be embedded too, along side
-    /// the uncompressed asset.
-    pub fn exclude<S: Into<String>>(mut self, ext: S) -> Self {
-        self.exclude.push(ext.into());
+    /// ```
+    /// # use includer_codegen::prelude::*;
+    /// #
+    /// WebAssets::new("ASSETS", "../web/dist")
+    ///     .whitelist()
+    ///     .filter(Filter::include_regex(r"^styles/.*\.css$"));
+    /// ```
+    ///
+    /// NOTE: If you need to care about multi-platform it's your responsibility
+    /// to use a proper regex that accounts for the proper path separator.
+    /// See [`FilterRule::regex`] for examples that account for this.
+    /// AFAIK `std::path` doesn't normalize the separators.
+    ///
+    /// [`FilterRule::regex`]: ./utils/enum.FilterRule.html#method.regex
+    pub fn filter(mut self, filter: Filter) -> Self {
+        self.filters.push(filter);
         self
     }
 
@@ -94,16 +125,29 @@ impl AssetsBuilder {
         self
     }
 
-    /// Sets filtering to a blacklist, using `exclude` regex's
-    pub fn blacklist(mut self) -> Self {
-        self.filter_type = FilterList::Blacklist;
+    /// Sets the path to the assets directory.
+    pub fn set_path<P: Into<PathBuf>>(mut self, path: P) -> Self {
+        self.path = path.into();
         self
     }
 
-    /// Sets filtering to a whitelist, using `include` regex's
-    pub fn whitelist(mut self) -> Self {
-        self.filter_type = FilterList::Whitelist;
+    /// Set the filter list type to a blacklist.
+    pub fn blacklist(mut self) -> Self {
+        self.filter_list_type = Blacklist;
         self
+    }
+
+    /// Set the filter list type to a whitelist.
+    pub fn whitelist(mut self) -> Self {
+        self.filter_list_type = Whitelist;
+        self
+    }
+
+    /// Boxes up the pipeline to pass to [`Codegen`] easily.
+    ///
+    /// [`Codegen`]: ../struct.Codegen.html
+    pub fn build(self) -> Box<Self> {
+        Box::new(self)
     }
 
     /// Sets whether to include the brotli version of every file too
@@ -117,79 +161,78 @@ impl AssetsBuilder {
         self.gzip = gzip;
         self
     }
-
-    pub fn set_path<P: Into<PathBuf>>(mut self, path: P) -> Self {
-        self.path = path.into();
-        self
-    }
-
-    pub fn build(self) -> Box<Self> {
-        Box::new(self)
-    }
 }
 
-impl Pipeline for AssetsBuilder {
-    // TODO: write this function
-    fn generate(&self) -> String {
+impl ToString for WebAssets {
+    fn to_string(&self) -> String {
         let mut entries = Vec::new();
         for maybe_entry in WalkDir::new(&self.path) {
             let entry = maybe_entry.unwrap();
 
-            // Make build.rs rerun if any of the dirs or files walked over are changed
-            println!("cargo:rerun-if-changed={}", entry.path().to_str().unwrap());
-
-            // We don't have special rules for directories, but we can't use walkdir's filter
-            // because we don't want directories to be skipped
+            // We don't have special rules for directories, but we can't use
+            // walkdir's entry filter because we don't want files under
+            // directories to be skipped.
             if entry.file_type().is_dir() {
+                utils::watch_path(entry.path());
                 continue;
             }
 
-            println!("{}", entry.path().to_str().unwrap());
-
-            match self.filter_type {
-                FilterList::Blacklist => {
-                    let ext = entry.path().extension();
-                    for exclude in &self.exclude {
-                        if ext == Some(exclude.as_ref()) {
-                            continue;
+            if self.filters.is_empty() {
+                match self.filter_list_type {
+                    Whitelist => break,
+                    Blacklist => {
+                        if !skip_compressed(&self, entry.path().extension()) {
+                            utils::watch_path(entry.path());
+                            entries.push(PathBuf::from(entry.path()));
                         }
-                    }
-
-                    if !skip_compressed(&self, ext) {
-                        entries.push(PathBuf::from(entry.path()));
-                    }
-                }
-                FilterList::Whitelist => {
-                    let ext = entry.path().extension();
-                    for include in &self.include {
-                        if ext == Some(include.as_ref()) && !skip_compressed(&self, ext) {
-                            entries.push(PathBuf::from(entry.path()))
-                        }
+                        continue;
                     }
                 }
             }
-        }
 
-        println!("{:?}", entries);
+            let mut matched = true;
+            for filter in &self.filters {
+                // Skip all filters that don't match the entry
+                if !filter.matches(entry.path()) {
+                    continue;
+                }
+
+                if skip_compressed(&self, entry.path().extension()) {
+                    matched = false;
+                }
+
+                if let Exclude(_) = filter {
+                    matched = false;
+                }
+
+                break;
+            }
+
+            if matched {
+                utils::watch_path(entry.path());
+                entries.push(PathBuf::from(entry.path()));
+            }
+        }
 
         let asset_info: Vec<AssetInfo> = entries
             .iter()
             .map(|p| AssetInfo {
-                path: p.to_str().unwrap().to_string(),
+                path: utils::path_to_string(p),
                 clean_path: normalize_path(p, &self.path, &self.prefix),
-                has_gz: compressed_exists(&p, Compressions::GZIP),
-                has_br: compressed_exists(&p, Compressions::BROTLI),
-            })
-            .collect();
+                has_gz: compressed_exists(&p, CompressionType::GZIP),
+                has_br: compressed_exists(&p, CompressionType::BROTLI),
+            }).collect();
 
         generate_asset_const(&self.ident, asset_info)
     }
 }
 
-fn compressed_exists(path: &Path, compression: Compressions) -> bool {
+impl Pipeline for WebAssets {}
+
+fn compressed_exists(path: &Path, compression: CompressionType) -> bool {
     let ext = match compression {
-        Compressions::GZIP => ".gz",
-        Compressions::BROTLI => ".br",
+        CompressionType::GZIP => ".gz",
+        CompressionType::BROTLI => ".br",
     };
 
     let f = path.file_name().unwrap();
@@ -199,7 +242,7 @@ fn compressed_exists(path: &Path, compression: Compressions) -> bool {
     Path::exists(&p)
 }
 
-fn skip_compressed(builder: &AssetsBuilder, ext: Option<&OsStr>) -> bool {
+fn skip_compressed(builder: &WebAssets, ext: Option<&OsStr>) -> bool {
     if builder.gzip && ext == Some("gz".as_ref()) {
         return true;
     }

@@ -8,6 +8,7 @@
 //! [`utils`]: ../utils/index.html
 
 pub use utils::Filter;
-//pub use web::AssetsBuilder;
 pub use Assets;
 pub use Codegen;
+#[cfg(feature = "web")]
+pub use WebAssets;

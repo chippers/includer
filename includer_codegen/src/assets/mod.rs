@@ -1,5 +1,5 @@
-//#[cfg(feature = "web")]
-//mod web;
+#[cfg(feature = "web")]
+pub mod web;
 
 use proc_macro2::{Ident, Span};
 use std::path::{Path, PathBuf};
@@ -12,8 +12,8 @@ use utils::FilterRule;
 use walkdir::WalkDir;
 use Pipeline;
 
-//#[cfg(feature = "web")]
-//pub use self::web::*;
+#[cfg(feature = "web")]
+pub use self::web::*;
 
 struct AssetInfo {
     path: String,
@@ -23,9 +23,9 @@ struct AssetInfo {
 pub struct Assets {
     ident: String,
     prefix: String,
+    path: PathBuf,
     filters: Vec<Filter>,
     filter_list_type: FilterListType,
-    path: PathBuf,
 }
 
 impl Assets {
@@ -35,10 +35,10 @@ impl Assets {
     pub fn new<S: Into<String>, P: Into<PathBuf>>(identifier: S, path: P) -> Self {
         Assets {
             ident: identifier.into(),
-            filters: Vec::new(),
-            filter_list_type: Blacklist,
             prefix: "/".to_string(),
             path: path.into(),
+            filters: Vec::new(),
+            filter_list_type: Blacklist,
         }
     }
 
