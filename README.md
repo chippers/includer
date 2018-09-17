@@ -1,10 +1,8 @@
 # includer [![Build Status](https://travis-ci.org/chippers/includer.svg?branch=master)](https://travis-ci.org/chippers/includer)
+
 Dynamically include assets from directories at compile time on stable rust with code generation.
 
-
 For crate specific information, check the README in their own directory.
-
-
 
 ### TODO
 
