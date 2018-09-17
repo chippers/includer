@@ -2,7 +2,7 @@ extern crate includer;
 #[cfg(test)]
 extern crate select;
 
-use includer::Asset;
+use includer::WebAsset;
 
 include!(concat!(env!("OUT_DIR"), "/assets.rs"));
 
@@ -22,12 +22,12 @@ pub fn index() -> &'static [u8] {
     ASSETS[idx].data()
 }
 
-/// Returns the index of your index.html from the raw generated `Asset` array
+/// Returns the index of index.html from the raw generated `WebAsset` array
 ///
 /// yeah confusing and not the best way but i found the name funny
-fn find_index_index(assets: &[Asset]) -> usize {
+fn find_index_index(assets: &[WebAsset]) -> usize {
     assets.iter()
-        .position(|a| a.uri() == "/index.html")
+        .position(|a| a.uri() == "/") // normalized to just "/" because its a web asset
 
         // reminder: don't do this in production, just simple for this test
         .expect("Not able to find index.html, this shouldn't happen")

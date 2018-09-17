@@ -8,7 +8,7 @@ fn main() {
     let cargo_dir = var("CARGO_MANIFEST_DIR").unwrap();
     let dist = PathBuf::from(cargo_dir).join("web/dist");
 
-    let webpack = Assets::new("ASSETS", dist).build();
+    let webpack = WebAssets::new("ASSETS", dist).build();
 
     Codegen::new().pipe(webpack).write();
 }
