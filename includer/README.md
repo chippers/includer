@@ -1,7 +1,22 @@
-# includer [![Build Status](https://travis-ci.org/chippers/includer.svg?branch=master)](https://travis-ci.org/chippers/includer)
+# includer [![Build Status](https://travis-ci.org/chippers/includer.svg?branch=master)](https://travis-ci.org/chippers/includer) [![Documentation](https://docs.rs/includer/badge.svg)](https://docs.rs/includer)
 
+The `includer` crate is the library to be used by other libraries/binaries.
+This can be considered the "frontend" counterpart to the build time crate that
+helps you generate code, `includer_codegen`.  For now it's mostly a simple
+type wrapper to get the generated code that's included to compile correctly and
+safely.
 
+You would not typically use the types from this library in your codebase, but
+rather only include them for the generated code to use.
 
+```rust
+extern crate includer;
+
+use includer::Asset;
+
+// The default file that includer_codegen generates
+include!(concat!(env!("OUT_DIR"), "/assets.rs"));
+```
 
 ## License
 
