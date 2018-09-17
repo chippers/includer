@@ -1,6 +1,10 @@
 # includer_codegen [![Build Status](https://travis-ci.org/chippers/includer.svg?branch=master)](https://travis-ci.org/chippers/includer) [![Documentation](https://docs.rs/includer_codegen/badge.svg)](https://docs.rs/includer_codegen)
+
 This crate is intended to be used at build time to generate code that includes
-your assets.
+your assets.  The "frontend" library [`includer`] provides the types for your
+library/binary that `includer_codegen` outputs, along with some helpers.
+
+[`includer`]: https://crates.io/crates/includer
 
 The following is a `build.rs` file that includes all the files (recursively) in
 the subdirectory `resources` in a cargo project.

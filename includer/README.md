@@ -2,9 +2,11 @@
 
 The `includer` crate is the library to be used by other libraries/binaries.
 This can be considered the "frontend" counterpart to the build time crate that
-helps you generate code, `includer_codegen`.  For now it's mostly a simple
+helps you generate code, [`includer_codegen`].  For now it's mostly a simple
 type wrapper to get the generated code that's included to compile correctly and
 safely.
+
+[`includer_codegen`]: https://crates.io/crates/includer_codegen
 
 You would not typically use the types from this library in your codebase, but
 rather only include them for the generated code to use.
