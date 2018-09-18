@@ -8,7 +8,6 @@ use utils::Filter;
 use utils::Filter::*;
 use utils::FilterListType;
 use utils::FilterListType::*;
-use utils::FilterRule;
 use walkdir::WalkDir;
 use Pipeline;
 
