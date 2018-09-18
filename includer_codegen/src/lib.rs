@@ -1,9 +1,5 @@
 #[macro_use]
 extern crate quote;
-#[cfg(feature = "web")]
-extern crate mime;
-#[cfg(feature = "web")]
-extern crate mime_guess;
 extern crate proc_macro2;
 pub extern crate regex;
 extern crate walkdir;

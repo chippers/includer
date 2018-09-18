@@ -7,7 +7,6 @@ For crate specific information, check the README in their own directory.
 ### TODO
 
 * make a compressed assets pipeline
-* make a default cargo feature for web assets
 * make a cargo feature for lazy_static initialized hashsets
 * flesh out readme
 * allow choice of const vs static?

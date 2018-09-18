@@ -8,7 +8,6 @@ use utils::FilterListType;
 use utils::FilterListType::*;
 use walkdir::WalkDir;
 use Pipeline;
-use mime_guess;
 
 struct AssetInfo {
     path: String,
@@ -291,16 +290,12 @@ fn generate_asset_const(ident_str: &str, raw_assets: Vec<AssetInfo>) -> String {
             quote! {None}
         };
 
-        // TODO
-        let mime = mime_guess::guess_mime_type(path);
-
         structs.push(quote! {
             WebAsset {
             uri: #clean_path,
             data: include_bytes!(#path),
             data_gz: #gz,
             data_br: #br,
-            mime: "text/plain",
             }
         });
     }
