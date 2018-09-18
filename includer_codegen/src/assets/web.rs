@@ -296,7 +296,6 @@ fn generate_asset_const(ident_str: &str, raw_assets: Vec<AssetInfo>) -> String {
             data: include_bytes!(#path),
             data_gz: #gz,
             data_br: #br,
-            mime: "text/plain",
             }
         });
     }

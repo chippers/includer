@@ -4,7 +4,6 @@ pub struct WebAsset {
     pub data: &'static [u8],
     pub data_gz: Option<&'static [u8]>,
     pub data_br: Option<&'static [u8]>,
-    pub mime: &'static str,
 }
 
 impl WebAsset {
@@ -22,9 +21,5 @@ impl WebAsset {
 
     pub fn data_br(&self) -> Option<&'static [u8]> {
         self.data_br
-    }
-
-    pub fn mime_type(&self) -> &'static str {
-        self.mime
     }
 }

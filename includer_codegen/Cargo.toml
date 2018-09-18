@@ -12,18 +12,13 @@ description = "Dynamically include assets at build time through code generation.
 
 [features]
 default = ["web"]
-web = ["mime", "mime_guess"]
+web = []
 
 [dependencies]
 walkdir = "2"
 quote = "0.6"
 regex = "1"
 proc-macro2 = "0.4"
-
-# web features
-mime = { version = "0.3", optional = true }
-mime_guess = { version = "2.0.0-alpha.6", optional = true }
-
 
 [badges]
 travis-ci = { repository = "chippers/includer" }
