@@ -1,5 +1,6 @@
 use proc_macro2::{Ident, Span};
 use std::ffi::OsStr;
+use std::fmt;
 use std::path::{Path, PathBuf};
 use utils;
 use utils::Filter;
@@ -163,8 +164,8 @@ impl WebAssets {
     }
 }
 
-impl ToString for WebAssets {
-    fn to_string(&self) -> String {
+impl fmt::Display for WebAssets {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut entries = Vec::new();
         for maybe_entry in WalkDir::new(&self.path) {
             let entry = maybe_entry.unwrap();
@@ -223,7 +224,8 @@ impl ToString for WebAssets {
                 has_br: compressed_exists(&p, CompressionType::BROTLI),
             }).collect();
 
-        generate_asset_const(&self.ident, asset_info)
+        let code = generate_asset_const(&self.ident, asset_info);
+        write!(f, "{}", code)
     }
 }
 

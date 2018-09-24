@@ -10,6 +10,7 @@ pub mod utils;
 
 pub use assets::*;
 use std::env;
+use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
@@ -144,9 +145,4 @@ impl Codegen {
 /// pipelines.
 ///
 /// [`Codegen`]: ./struct.Codegen.html
-pub trait Pipeline: ToString {
-    /*/// Generates a string of Rust code to be inserted in the [`Codegen`] file.
-    ///
-    /// [`Codegen`]: ./struct.Codegen.html
-    fn generate(&self) -> String;*/
-}
+pub trait Pipeline: Display {}

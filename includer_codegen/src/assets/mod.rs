@@ -2,6 +2,7 @@
 pub mod web;
 
 use proc_macro2::{Ident, Span};
+use std::fmt;
 use std::path::{Path, PathBuf};
 use utils;
 use utils::Filter;
@@ -145,8 +146,8 @@ impl Assets {
     }
 }
 
-impl ToString for Assets {
-    fn to_string(&self) -> String {
+impl fmt::Display for Assets {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut entries = Vec::new();
         for maybe_entry in WalkDir::new(&self.path) {
             let entry = maybe_entry.expect("Couldn't read DirEntry");
@@ -201,7 +202,8 @@ impl ToString for Assets {
             panic!("No assets were matched, something is wrong")
         }
 
-        generate_asset_const(&self.ident, asset_info)
+        let code = generate_asset_const(&self.ident, asset_info);
+        write!(f, "{}", code)
     }
 }
 
